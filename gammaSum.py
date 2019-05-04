@@ -43,10 +43,10 @@ def generate_gamma_sum_MC(rates, shapez, n_samples):
 def eval_integrand(a, b, c, d, z, s):
     """
     Evaluates the integrand of the Fox's \overbar{H} function in (z,s)
-    :param a (list of floats): first vector of length n. Each element is a tuple (\alpha_j, A_j, a_j)
-    :param b (list of floats): second vector of length p - n. Each element is a tuple (\alpha_j, A_j)
-    :param c (list of floats): third vector of length m. Each element is a tuple (\beta_j, B_j)
-    :param d (list of floats): fourth vector of length q - m. Each element is a tuple (\beta_j, B_j, b_j)
+    :param a (list of tuples): first vector of length n. Each element is a tuple (\alpha_j, A_j, a_j)
+    :param b (list of tuples): second vector of length p - n. Each element is a tuple (\alpha_j, A_j)
+    :param c (list of tuples): third vector of length m. Each element is a tuple (\beta_j, B_j)
+    :param d (list of tuples): fourth vector of length q - m. Each element is a tuple (\beta_j, B_j, b_j)
     :param z (float): value of the \overbar{H} function to evaluate
     :param s (complex): value where to evaluate the integrand
     :return (float): the value of the integrand in (z,s)
@@ -97,10 +97,10 @@ from mpmath import *
 def FoxHBar(a, b, c, d, z):
     """
     Evaluates the Fox's \overbar{H} function in z
-    :param a (list of floats): first vector of length n. Each element is a tuple (\alpha_j, A_j, a_j)
-    :param b (list of floats): second vector of length p - n. Each element is a tuple (\alpha_j, A_j)
-    :param c (list of floats): third vector of length m. Each element is a tuple (\beta_j, B_j)
-    :param d (list of floats): fourth vector of length q - m. Each element is a tuple (\beta_j, B_j, b_j)
+    :param a (list of tuples): first vector of length n. Each element is a tuple (\alpha_j, A_j, a_j)
+    :param b (list of tuples): second vector of length p - n. Each element is a tuple (\alpha_j, A_j)
+    :param c (list of tuples): third vector of length m. Each element is a tuple (\beta_j, B_j)
+    :param d (list of tuples): fourth vector of length q - m. Each element is a tuple (\beta_j, B_j, b_j)
     :param z (float): value of the \overbar{H} function to evaluate
     :return (mpc): the value of the function in z
     """
