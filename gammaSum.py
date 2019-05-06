@@ -104,9 +104,15 @@ def FoxHBar(a, b, c, d, z):
     :param z (float): value of the \overbar{H} function to evaluate
     :return (mpc): the value of the function in z
     """
+    assert (all(len(x) == 3 for x in a))
+    assert (all(len(x) == 2 for x in b))
+    assert (all(len(x) == 3 for x in d))
+    assert (all(len(x) == 2 for x in c))
+    assert (z != 0)
 
     M = 1e6  # Sufficiently big interval
-    # The only singularity on the Re(s) = 0 axis could be in s = 0, so we split the integral into (-inf, 0) and (0, inf)
+    # The only singularity on the Re(s) = 0 axis could be in s = 0, so we split the integral into (-1j*inf, 0)
+    # and (0, 1j*inf)
     H = 1.0 / (2.0 * np.pi * 1j) * chop(quad(lambda s: eval_integrand(a, b, c, d, z, s), [-M * 1j, 0, M * 1j],
                                              maxdegree=6))
 
@@ -144,6 +150,40 @@ def gamma_sum_PDF(rates, shapez, y):
     return f
 
 
+def gamma_sum_CDF(rates, shapez, y):
+    """
+    Evaluates the CDF of a sum of len(rates) gamma variates, with rate rates(i) and shape shapez(i) in y according to:
+    "New Results on the Sum of Gamma Random Variates With Application to the Performance of Wireless Communication Systems
+    over Nakagami-m Fading Channels", https://arxiv.org/abs/1202.2576
+    :param rates (list of floats): rate parameters
+    :param shapez (list of floats): shape parameters. Must be have the same length as len(rates)
+    :param y (float): value where to evaluate the PDF
+    :return (mpc): value of the CDF in y
+    """
+    assert (isinstance(rates, list))
+    assert (isinstance(shapez, list))
+    assert (len(rates) == len(shapez))
+
+    z = exp(y)
+
+    psi1 = []
+    psi2 = []
+
+    K = 1.0
+
+    for l, a in zip(rates, shapez):
+        psi1.append([1.0 - l, 1.0, a])
+        psi2.append([-l, 1.0, a])
+        K *= l ** a
+
+    psi1.append([1, 1, 1])
+    psi2.append([0, 1, 1])
+
+    f = 0.5 + K * FoxHBar(psi1, [], [], psi2, z)
+
+    return f
+
+
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
@@ -173,6 +213,19 @@ if __name__ == "__main__":
     plt.plot(Y, F, label='Analytical')
     plt.xlabel('Y')
     plt.ylabel('PDF')
+    plt.title('Sum of ' + str(len(rates)) + ' Gamma random variables')
+    plt.legend()
+
+    plt.figure()
+    n, bins, patches = plt.hist(S, n_bins, density=True, facecolor='b', alpha=0.75, label='Montecarlo', cumulative=True)
+    Y = np.linspace(bins.min(), bins.max(), n_bins * 2)
+    F = []
+    for y in Y:
+        f = gamma_sum_CDF(rates, shapez, y)
+        F.append(float(f.real))
+    plt.plot(Y, F, label='Analytical')
+    plt.xlabel('Y')
+    plt.ylabel('CDF')
     plt.title('Sum of ' + str(len(rates)) + ' Gamma random variables')
     plt.legend()
 
